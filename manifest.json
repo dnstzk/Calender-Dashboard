@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Count hours of entry Thesis in gCalender",
+  "version": "1.0",
+  "action":  {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": [
+    "https://calendar.google.com/*"
+  ],
+  "permissions": [
+    "identity"
+  ],
+  "oauth2": {
+    "client_id": [],
+    "scopes": [
+      "https://www.googleapis.com/auth/calendar.readonly"
+    ],
+    "key": []
+  }
+}
