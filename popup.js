@@ -16,59 +16,59 @@ const headers = new Headers({
 
 const queryParams = { headers };
 
-const primaryCalender = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
-const querryFor = '?';
-const AND = '&'
-const maxResults = 'maxResults=2500';
-const name = 'q=Thesis';
-const timeMin = 'timeMin=2022-05-01T10:00:00-07:00';
-const fetchConfig = querryFor + maxResults + AND + name + AND + timeMin;
+const calenderURL = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+const fetchConfig =
+  '?' + 'maxResults=2500' +
+  '&' + 'q=Thesis' +
+  '&' + 'timeMin=2022-05-01T10:00:00-07:00';
 
 
-fetch(primaryCalender + fetchConfig, queryParams)
-.then((response) => response.json()) // Transform the data into json
+function appendContent(ul, content) {
+        var li = document.createElement("li");
+        li.append(content);
+        ul.appendChild(li);
+}
+
+function sumUpInvestedMinutes(data) {
+    var investedMinutes = 0;
+
+    data.items.forEach((item, i) => {
+      var itemStartTime = item.start.dateTime.substring(0,16).replaceAll('-','/').replace('T', ' ');
+      var itemEndTime = item.end.dateTime.substring(0,16).replaceAll('-','/').replace('T', ' ');
+      var diff = Math.abs(new Date(itemStartTime) - new Date(itemEndTime));
+      var sessionLengthInMinutes = Math.floor((diff/1000)/60);
+
+      investedMinutes = investedMinutes + sessionLengthInMinutes;
+    });
+
+    return investedMinutes;
+}
+
+fetch(calenderURL + fetchConfig, queryParams)
+.then((response) => response.json())
 .then(function(data) {
     const ul = document.querySelector("ul");
 
     var li = document.createElement("li");
-    li.append("Searched for:" + "'Thesis' and fround: " +data.items.length + " entries");
+    li.append("Sessions: " + data.items.length);
     ul.appendChild(li);
 
-    var li = document.createElement("li");
-    li.append(" ");
-    ul.appendChild(li);
+    var totalInvestedMinutes = sumUpInvestedMinutes(data);
 
-    var totalMinutes = 0;
+    var totalHours = Math.floor(totalInvestedMinutes / 60);
+    var totalMinutes = totalInvestedMinutes % 60;
 
-    data.items.forEach((item, i) => {
-      var date = item.start.dateTime.substring(0,10);
-      var name = item.summary;
+    appendContent(ul, "Invested: " + totalHours + "h " + totalMinutes + "min");
 
-      var startTime = item.start.dateTime.substring(11,16);
-      var endTime = item.end.dateTime.substring(11,16);
+    var perSession = totalInvestedMinutes / data.items.length;
+    var totalHours = Math.floor(perSession / 60);
+    var totalMinutes = ((perSession % 60) + "").substring(0,2);
 
+    appendContent(ul, "Average: " + totalHours + "h " + totalMinutes + "min");
 
-      var dateSomeStart = item.start.dateTime.substring(0,16).replaceAll('-','/').replace('T', ' ');
-      var dateSomeEnd = item.end.dateTime.substring(0,16).replaceAll('-','/').replace('T', ' ');
+    appendContent(ul ,"_______________________________________________________________");
 
-
-
-      var diff = Math.abs(new Date(dateSomeEnd) - new Date(dateSomeStart));
-
-      var minutes = Math.floor((diff/1000)/60);
-
-      var li = document.createElement("li");
-      li.append(date + "  " + name + " " + startTime + "  " + endTime + " " + minutes);
-      ul.appendChild(li);
-
-      totalMinutes = totalMinutes + minutes;
-    });
-
-    var restMinuten = totalMinutes % 60;
-    var anteilStunden = Math.floor(totalMinutes / 60);
-
-    var li = document.createElement("li");
-    li.append("Bisher gelernte Zeit: " + anteilStunden + "h " + restMinuten + "min" );
-    ul.appendChild(li);
+    appendContent(ul, "Open Hours: " + "TODO")
+    appendContent(ul, "Open Days Se: " + "TODO")
   })
 })
