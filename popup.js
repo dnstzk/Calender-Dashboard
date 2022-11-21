@@ -61,14 +61,27 @@ fetch(calenderURL + fetchConfig, queryParams)
     appendContent(ul, "Invested: " + totalHours + "h " + totalMinutes + "min");
 
     var perSession = totalInvestedMinutes / data.items.length;
-    var totalHours = Math.floor(perSession / 60);
-    var totalMinutes = ((perSession % 60) + "").substring(0,2);
+    var totalHoursEachSession = Math.floor(perSession / 60);
+    var totalMinutesEachSession = ((perSession % 60) + "").substring(0,2);
 
-    appendContent(ul, "Average: " + totalHours + "h " + totalMinutes + "min");
+    appendContent(ul, "Average: " + totalHoursEachSession + "h " + totalMinutesEachSession + "min");
 
     appendContent(ul ,"_______________________________________________________________");
 
-    appendContent(ul, "Open Hours: " + "TODO")
-    appendContent(ul, "Open Days Se: " + "TODO")
+    appendContent(ul, "Needed hours: 720 - 900");
+    appendContent(ul, "Open Hours: " + (900 - (totalHours + 1)) + "h " + (60 - totalMinutes) + "min");
+    appendContent(ul, "Done: " + 100*(totalInvestedMinutes/(900*60)).toFixed(4) + "%");
+
+    appendContent(ul ,"_______________________________________________________________");
+
+
+    var now = new Date().setHours(9,0,0);
+    var end = new Date("March 30, 2023 00:00:00");
+
+    var diff = end - now;
+    var days = Math.floor(diff / 1000 / 60 / (60 * 24));
+
+    appendContent(ul, "Open Days Se: " + days);
+    appendContent(ul, "Progress: " + 100*((180 - days)/180).toFixed(4) + "%");
   })
 })
