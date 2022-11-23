@@ -2,6 +2,9 @@
   "manifest_version": 3,
   "name": "Count hours of entry Thesis in gCalender",
   "version": "1.0",
+  "icons": {
+    "128": "calendar.png"
+  },
   "action":  {
     "default_popup": "popup.html"
   },
