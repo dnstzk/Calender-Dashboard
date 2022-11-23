@@ -23,9 +23,17 @@ const fetchConfig =
   '&' + 'timeMin=2022-05-01T10:00:00-07:00';
 
 
-function appendContent(ul, content) {
+function appendContent(ul, title, number) {
         var li = document.createElement("li");
-        li.append(content);
+
+        var d1 = document.createElement("div");
+        d1.append(title);
+        li.append(d1);
+
+        var d2 = document.createElement("div");
+        d2.append(number);
+        li.append(d2);
+
         ul.appendChild(li);
 }
 
@@ -47,33 +55,29 @@ function sumUpInvestedMinutes(data) {
 fetch(calenderURL + fetchConfig, queryParams)
 .then((response) => response.json())
 .then(function(data) {
-    const ul = document.querySelector("ul");
+    const ul1 = document.getElementById('L1');
 
-    var li = document.createElement("li");
-    li.append("Sessions: " + data.items.length);
-    ul.appendChild(li);
+    appendContent(ul1, "Sessions: ", data.items.length);
 
     var totalInvestedMinutes = sumUpInvestedMinutes(data);
-
     var totalHours = Math.floor(totalInvestedMinutes / 60);
     var totalMinutes = totalInvestedMinutes % 60;
 
-    appendContent(ul, "Invested: " + totalHours + "h " + totalMinutes + "min");
+    appendContent(ul1, "Invested: ", totalHours + "h " + totalMinutes + "min");
 
     var perSession = totalInvestedMinutes / data.items.length;
     var totalHoursEachSession = Math.floor(perSession / 60);
     var totalMinutesEachSession = ((perSession % 60) + "").substring(0,2);
 
-    appendContent(ul, "Average: " + totalHoursEachSession + "h " + totalMinutesEachSession + "min");
+    appendContent(ul1, "Average: ", totalHoursEachSession + "h " + totalMinutesEachSession + "min");
 
-    appendContent(ul ,"_______________________________________________________________");
+    const ul2 = document.getElementById('L2');
 
-    appendContent(ul, "Needed hours: 720 - 900");
-    appendContent(ul, "Open Hours: " + (900 - (totalHours + 1)) + "h " + (60 - totalMinutes) + "min");
-    appendContent(ul, "Done: " + 100*(totalInvestedMinutes/(900*60)).toFixed(4) + "%");
+    appendContent(ul2, "Needed hours: ", "720 - 900");
+    appendContent(ul2, "Open Hours: ", (900 - (totalHours + 1)) + "h " + (60 - totalMinutes) + "min");
+    appendContent(ul2, "Done: ", 100*(totalInvestedMinutes/(900*60)).toFixed(4) + "%");
 
-    appendContent(ul ,"_______________________________________________________________");
-
+    const ul3 = document.getElementById('L3');
 
     var now = new Date().setHours(9,0,0);
     var end = new Date("March 30, 2023 00:00:00");
@@ -81,7 +85,7 @@ fetch(calenderURL + fetchConfig, queryParams)
     var diff = end - now;
     var days = Math.floor(diff / 1000 / 60 / (60 * 24));
 
-    appendContent(ul, "Open Days Se: " + days);
-    appendContent(ul, "Progress: " + 100*((180 - days)/180).toFixed(4) + "%");
+    appendContent(ul3, "Open Days Se: ", days);
+    appendContent(ul3, "Progress of Se: ", parseFloat(100*((180 - days)/180)).toFixed(2) + "%");
   })
 })
