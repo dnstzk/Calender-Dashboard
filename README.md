@@ -1,4 +1,4 @@
-# Sum-Calender-Entries
+# Calender-Dashboard
 Wenn ich Zeit in meine Thesis stecke, trage ich mir die gelernten Stunden in den Google Kalender.
 Die entsprechenden Termine haben immer den Namen "Thesis".
 
