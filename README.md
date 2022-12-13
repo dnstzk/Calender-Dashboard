@@ -1,8 +1,10 @@
-# Sum-Calender-Entries
-Wenn ich Zeit in meine Thesis stecke, trage ich mir die gelernten Stunden in den Google Kalender.
-Die entsprechenden Termine haben immer den Namen "Thesis".
+# Calender-Dashboard
 
-Mit dieser Extentision frage ich per Google API die Kalender-Einträge mit Namen "Thesis" ab und lasse mir die Summe der investierten Stunden im Popup anzeigen.
-Damit kann man selber überprüfen, ob man sich den empfohlenen LP pro Semester nähert.
+I track my thesis study sessions with google calender. All corresponding events have the title "Thesis". 
 
-![image](https://user-images.githubusercontent.com/80718816/203597127-b1784afd-b56d-4120-be34-5cb280d2f869.png)
+I build this chrome extension to evaluate via Google Calender API my investments, so I can check if I am on track:
+
+![image](https://user-images.githubusercontent.com/80718816/207384131-63d1c6c7-9445-4dde-8b6d-8afc23f51547.png)
+
+If you want to reuse my code, you need an api-key and a client-id for your extension. 
+You get both here: https://console.cloud.google.com/
