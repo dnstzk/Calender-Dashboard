@@ -1,83 +1,59 @@
-await chrome.identity.getAuthToken({ 'interactive': true }, function(token) {
-  var init = {
-    'method' : 'GET',
-    'async'  : true,
-    'headers': {
-      'Authorization' : 'Bearer ' + token,
-      'Content-Type': 'application/json'
-    },
-    'contentType': 'json'
-  };
+// Pass manifest oauth2 token to chrome and execute myCallBack
+chrome.identity.getAuthToken({ 'interactive': true }, myCallBack)
 
-const headers = new Headers({
-    'Authorization' : 'Bearer ' + token,
-    'Content-Type': 'application/json'
-})
+function myCallBack(token) {
 
-const queryParams = { headers };
+    const calenderURL = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
 
-const calenderURL = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
-const fetchConfig =
-  '?' + 'maxResults=2500' +
-  '&' + 'q=Thesis' +
-  '&' + 'timeMin=2022-05-01T10:00:00-07:00';
-
-
-function appendContent(ul, title, number) {
-        var li = document.createElement("li");
-
-        var d1 = document.createElement("div");
-        d1.append(title);
-        li.append(d1);
-
-        var d2 = document.createElement("div");
-        d2.append(number);
-        li.append(d2);
-
-        ul.appendChild(li);
-}
-
-function sumUpInvestedMinutes(data) {
-    var investedMinutes = 0;
-
-    data.items.forEach((item, i) => {
-      var itemStartTime = item.start.dateTime.substring(0,16).replaceAll('-','/').replace('T', ' ');
-      var itemEndTime = item.end.dateTime.substring(0,16).replaceAll('-','/').replace('T', ' ');
-      var diff = Math.abs(new Date(itemStartTime) - new Date(itemEndTime));
-      var sessionLengthInMinutes = Math.floor((diff/1000)/60);
-
-      investedMinutes = investedMinutes + sessionLengthInMinutes;
+    const headers = new Headers({
+        'Authorization' : 'Bearer ' + token,
+        'Content-Type': 'application/json'
     });
 
-    return investedMinutes;
-}
+    const fetchConfig =
+        '?' + 'maxResults=2500' +
+        '&' + 'q=Thesis' +
+        '&' + 'timeMax=2023-04-01T10:00:00-00:00' + // Semester end
+        '&' + 'timeMin=2022-05-01T10:00:00-00:00';  // First topic contact
 
-fetch(calenderURL + fetchConfig, queryParams)
-.then((response) => response.json())
-.then(function(data) {
-    const ul1 = document.getElementById('L1');
+    fetch(calenderURL + fetchConfig, { headers })
+        .then((data) => data.json())
+        .then((data) => process(data));
+};
 
-    appendContent(ul1, "Sessions: ", data.items.length);
+function process(data) {
 
-    var totalInvestedMinutes = sumUpInvestedMinutes(data);
+    const doneID = document.getElementById('done');
+    var itemsUntilNow = extractItemsUntilNow(data.items);
+
+    var totalInvestedMinutes = sumUpInvestedMinutes(itemsUntilNow);
     var totalHours = Math.floor(totalInvestedMinutes / 60);
     var totalMinutes = totalInvestedMinutes % 60;
 
-    appendContent(ul1, "Invested: ", totalHours + "h " + totalMinutes + "min");
-
-    var perSession = totalInvestedMinutes / data.items.length;
+    var perSession = totalInvestedMinutes / itemsUntilNow.length;
     var totalHoursEachSession = Math.floor(perSession / 60);
     var totalMinutesEachSession = ((perSession % 60) + "").substring(0,2);
 
-    appendContent(ul1, "Average: ", totalHoursEachSession + "h " + totalMinutesEachSession + "min");
+    appendTableLine(doneID, "Sessions: ",
+                              "Invested: ",
+                              "Average: ");
+    appendTableLine(doneID, itemsUntilNow.length,
+                              totalHours + "h " + totalMinutes + "min",
+                              totalHoursEachSession + "h " + totalMinutesEachSession + "min");
 
-    const ul2 = document.getElementById('L2');
+//  --------------------------------------------------------------------------------------------------------------------
+    const requiredID = document.getElementById('required');
 
-    appendContent(ul2, "Needed hours: ", "720 - 900");
-    appendContent(ul2, "Open Hours: ", (900 - (totalHours + 1)) + "h " + (60 - totalMinutes) + "min");
-    appendContent(ul2, "Done: ", 100*(totalInvestedMinutes/(900*60)).toFixed(4) + "%");
+    appendTableLine(requiredID, "Needed",
+                                "Open",
+                                "Done");
+    appendTableLine(requiredID,
+                    "720 - 900 h", (900 - (totalHours + 1)) + "h " + (60 - totalMinutes) + "min",
+                    parseFloat(100*(totalInvestedMinutes/(900*60))).toFixed(2) + "%");
 
-    const ul3 = document.getElementById('L3');
+
+//  --------------------------------------------------------------------------------------------------------------------
+    const timeID = document.getElementById('time');
 
     var now = new Date().setHours(9,0,0);
     var end = new Date("March 30, 2023 00:00:00");
@@ -85,7 +61,76 @@ fetch(calenderURL + fetchConfig, queryParams)
     var diff = end - now;
     var days = Math.floor(diff / 1000 / 60 / (60 * 24));
 
-    appendContent(ul3, "Open Days Se: ", days);
-    appendContent(ul3, "Progress of Se: ", parseFloat(100*((180 - days)/180)).toFixed(2) + "%");
-  })
-})
+    appendTableLine(timeID, "Total",
+                            "Open",
+                            "Passed");
+    appendTableLine(timeID, "180",
+                            days,
+                            parseFloat(100*((180 - days)/180)).toFixed(2) + "%");
+
+//  --------------------------------------------------------------------------------------------------------------------
+
+    const planedID = document.getElementById('planed');
+
+    var totalInvestedMinutes = sumUpInvestedMinutes(data.items);
+    var totalHours = Math.floor(totalInvestedMinutes / 60);
+    var totalMinutes = totalInvestedMinutes % 60;
+
+    var perSession = totalInvestedMinutes / data.items.length;
+    var totalHoursEachSession = Math.floor(perSession / 60);
+    var totalMinutesEachSession = ((perSession % 60) + "").substring(0,2);
+
+    appendTableLine(planedID, "Sessions: ",
+                              "Invested: ",
+                              "Average: ");
+    appendTableLine(planedID, data.items.length,
+                              totalHours + "h " + totalMinutes + "min",
+                              totalHoursEachSession + "h " + totalMinutesEachSession + "min");
+};
+
+function appendTableLine(tag, title1, titel2, titel3) {
+        var li = document.createElement("li");
+
+        var d1 = document.createElement("div");
+        d1.append(title1);
+        li.append(d1);
+
+        var d2 = document.createElement("div");
+        d2.append(titel2);
+        li.append(d2);
+
+        var d3 = document.createElement("div");
+        d3.append(titel3);
+        li.append(d3);
+
+        tag.appendChild(li);
+};
+
+function sumUpInvestedMinutes(items) {
+    var investedMinutes = 0;
+
+    for (let item of items) {
+        var itemStartTime = item.start.dateTime.substring(0,16).replaceAll('-','/').replace('T', ' ');
+        var itemEndTime = item.end.dateTime.substring(0,16).replaceAll('-','/').replace('T', ' ');
+        var diff = Math.abs(new Date(itemStartTime) - new Date(itemEndTime));
+        var sessionLengthInMinutes = Math.floor((diff/1000)/60);
+
+        investedMinutes = investedMinutes + sessionLengthInMinutes;
+    }
+
+    return investedMinutes;
+};
+
+function extractItemsUntilNow(items) {
+    var result = [];
+
+    var now = new Date();
+    for (let item of items) {
+        var itemDate = new Date(item.start.dateTime);
+        if (itemDate < now) {
+            result.push(item);
+        }
+    }
+
+    return result;
+};
