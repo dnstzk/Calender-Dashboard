@@ -5,7 +5,7 @@ body {
 ul {
   list-style-type: none;
   padding-inline-start: 0;
-  margin: 1rem 0;
+  margin: 0;
   border-top: 1px solid black;
 }
 
@@ -19,12 +19,7 @@ li:nth-child(even) {
   background: #ffffff;
 }
 
-h3,
-p {
-  margin: 0;
-}
-
 div {
-    width: 50%;
+    width: 33%;
     display: inline-block;
 }
